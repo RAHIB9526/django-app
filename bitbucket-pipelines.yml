@@ -1,0 +1,22 @@
+image: python
+
+definitions:
+  services:
+    docker:
+      memory: 1024
+  steps:
+    - build: &buildAndPush
+        name: Building docker image
+        script:
+          - export TAG=$(echo "$BITBUCKET_COMMIT" | cut -c 1-7)
+          - docker build -t $IMAGE_NAME:$TAG .
+          - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+          - docker push $IMAGE_NAME:$TAG
+
+pipelines:
+  branches:
+    main:
+      - step: 
+          <<: *buildAndPush
+          # deployment: production
+
